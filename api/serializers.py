@@ -20,6 +20,15 @@ class CommentSerializer(serializers.ModelSerializer):
 
 
 class FollowSerializer(serializers.ModelSerializer):
+    user = serializers.ReadOnlyField(source='user.username')
+    following = serializers.ReadOnlyField(source='user.following')
+
     class Meta:
         fields = ('user', 'following')
         model = Follow
+
+
+class GroupSerializer(serializers.ModelSerializer):
+    class Meta:
+        fields = ('title',)
+        model = Group

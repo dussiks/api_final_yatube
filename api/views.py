@@ -2,7 +2,9 @@ from rest_framework import viewsets, permissions
 from rest_framework.generics import get_object_or_404
 
 from .models import Post, Comment
-from .serializers import PostSerializer, CommentSerializer, FollowSerializer
+from .serializers import (
+    PostSerializer, CommentSerializer, FollowSerializer, GroupSerializer
+)
 from .permissions import IsOwnerOrReadOnly
 
 
@@ -34,3 +36,13 @@ class CommentViewSet(viewsets.ModelViewSet):
 
     def perform_update(self, serializer):
         serializer.save(author=self.request.user)
+
+
+class FollowViewSet(viewsets.ModelViewSet):
+    http_method_names = ['get', 'post']
+    pass
+
+
+class GroupViewSet(viewsets.ModelViewSet):
+    http_method_names = ['get', 'post']
+    pass

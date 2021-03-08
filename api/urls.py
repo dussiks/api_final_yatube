@@ -15,8 +15,8 @@ v1_router.register(
     CommentViewSet,
     basename='comments',
 )
-#v1_router.register('follow', FollowViewSet, basename='follow')
-#v1_router.register('group', GroupViewSet, basename='group')
+#v1_router.register(r'follow', FollowViewSet, basename='follow')
+#v1_router.register(r'group', GroupViewSet, basename='group')
 
 urlpatterns = [
     path(
