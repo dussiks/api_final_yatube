@@ -28,3 +28,16 @@ class Comment(models.Model):
     created = models.DateTimeField(
         "Дата добавления", auto_now_add=True, db_index=True
     )
+
+
+class Follow(models.Model):
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='user', null=False,
+    )
+    following = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='following', null=False,
+    )
+
+
+class Group(models.Model):
+    title = models.CharField(max_length=200)
