@@ -1,11 +1,17 @@
-from rest_framework import viewsets, permissions
+from rest_framework import viewsets, permissions, mixins
 from rest_framework.generics import get_object_or_404
 
-from .models import Post, Comment
+from .models import Post, Comment, Follow, Group
 from .serializers import (
     PostSerializer, CommentSerializer, FollowSerializer, GroupSerializer
 )
 from .permissions import IsOwnerOrReadOnly
+
+
+class CreateListViewSet(mixins.ListModelMixin,
+                        mixins.CreateModelMixin,
+                        viewsets.GenericViewSet):
+    pass
 
 
 class PostViewSet(viewsets.ModelViewSet):
@@ -38,11 +44,22 @@ class CommentViewSet(viewsets.ModelViewSet):
         serializer.save(author=self.request.user)
 
 
-class FollowViewSet(viewsets.ModelViewSet):
-    http_method_names = ['get', 'post']
-    pass
+class FollowViewSet(CreateListViewSet):
+    serializer_class = FollowSerializer
+    permission_classes = (
+        IsOwnerOrReadOnly,
+        permissions.IsAuthenticatedOrReadOnly,
+    )
+
+    def get_queryset(self):
+        queryset = Follow.objects.all()
+        return queryset
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
 
 
-class GroupViewSet(viewsets.ModelViewSet):
-    http_method_names = ['get', 'post']
-    pass
+class GroupViewSet(CreateListViewSet):
+    serializer_class = GroupSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly, )
+    queryset = Group.objects.all()
