@@ -42,7 +42,10 @@ class CommentViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         post = get_object_or_404(Post, pk=self.kwargs.get('post_id'))
         queryset = Comment.objects.select_related(
-                   'post', 'author').filter(post=post.id)
+            'post', 'author'
+        ).filter(
+            post=post.id
+        )
         return queryset
 
     def perform_create(self, serializer):
