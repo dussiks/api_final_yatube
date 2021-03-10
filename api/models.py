@@ -5,7 +5,7 @@ User = get_user_model()
 
 
 class Group(models.Model):
-    title = models.CharField(max_length=200)
+    title = models.CharField('группа', max_length=200)
 
     def __str__(self):
         return self.title[:10]
@@ -46,8 +46,8 @@ class Comment(models.Model):
 
 class Follow(models.Model):
     user = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name='user', null=False,
+        User, on_delete=models.CASCADE, related_name='user',
     )
     following = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name='following', null=False,
+        User, on_delete=models.CASCADE, related_name='following',
     )
