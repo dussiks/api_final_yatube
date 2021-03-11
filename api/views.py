@@ -1,8 +1,7 @@
-from rest_framework import viewsets, permissions, mixins, filters
+from rest_framework import viewsets, permissions, mixins
 from rest_framework.generics import get_object_or_404
-from django_filters.rest_framework import DjangoFilterBackend
 
-from .models import Post, Comment, Follow, Group, User
+from .models import Post, Follow, Group, User
 from .serializers import (
     PostSerializer, CommentSerializer, FollowSerializer, GroupSerializer
 )
@@ -21,8 +20,7 @@ class PostViewSet(viewsets.ModelViewSet):
         permissions.IsAuthenticatedOrReadOnly,
     )
     serializer_class = PostSerializer
-    queryset = Post.objects.select_related('author', 'group').all()
-    filter_backends = [DjangoFilterBackend]
+    queryset = Post.objects.optimized()
     filterset_fields = ['group', ]
 
     def perform_create(self, serializer):
@@ -41,29 +39,23 @@ class CommentViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         post = get_object_or_404(Post, pk=self.kwargs.get('post_id'))
-        queryset = Comment.objects.select_related(
-            'post', 'author'
-        ).filter(
-            post=post.id
-        )
+        queryset = post.comments.filter(post=post.id)
         return queryset
 
     def perform_create(self, serializer):
-        serializer.save(author=self.request.user)
-
-    def perform_update(self, serializer):
         serializer.save(author=self.request.user)
 
 
 class FollowViewSet(CreateListViewSet):
     serializer_class = FollowSerializer
     permission_classes = (permissions.IsAuthenticated, )
-    filter_backends = [filters.SearchFilter]
-    search_fields = ['user__username', 'following__username']
+    search_fields = ['user__username']
 
     def get_queryset(self):
-        following = get_object_or_404(User, username=self.request.user)
-        queryset = Follow.objects.filter(following=following)
+        following = get_object_or_404(
+            User, username=self.request.user.username
+        )
+        queryset = following.following.all()
         return queryset
 
     def perform_create(self, serializer):

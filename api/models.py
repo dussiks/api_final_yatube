@@ -11,6 +11,19 @@ class Group(models.Model):
         return self.title[:10]
 
 
+class PostManager(models.Manager):
+    def __getattr__(self, attr, *args):
+        try:
+            return getattr(self.__class__, attr, *args)
+        except AttributeError:
+            if attr.startswith('__') and attr.endswith('__'):
+                raise
+            return getattr(self.get_query_set(), attr, *args)
+
+    def optimized(self):
+        return self.select_related('group', 'author').all()
+
+
 class Post(models.Model):
     text = models.TextField()
     pub_date = models.DateTimeField(
@@ -26,6 +39,7 @@ class Post(models.Model):
         null=True,
         blank=True,
     )
+    objects = PostManager()
 
     def __str__(self):
         return self.text
