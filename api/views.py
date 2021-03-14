@@ -1,7 +1,7 @@
 from rest_framework import viewsets, permissions, mixins
 from rest_framework.generics import get_object_or_404
 
-from .models import Post, Group, User
+from .models import Post, Group, Follow
 from .serializers import (
     PostSerializer, CommentSerializer, FollowSerializer, GroupSerializer
 )
@@ -39,7 +39,7 @@ class CommentViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         post = get_object_or_404(Post, pk=self.kwargs.get('post_id'))
-        queryset = post.comments.filter(post=post.id)
+        queryset = post.comments.all()
         return queryset
 
     def perform_create(self, serializer):
@@ -49,13 +49,13 @@ class CommentViewSet(viewsets.ModelViewSet):
 class FollowViewSet(CreateListViewSet):
     serializer_class = FollowSerializer
     permission_classes = (permissions.IsAuthenticated, )
-    search_fields = ['user__username']
+    search_fields = ['user__username', 'following__username']
 
     def get_queryset(self):
-        following = get_object_or_404(
-            User, username=self.request.user.username
-        )
-        queryset = following.following.all()
+        user = self.request.user
+        queryset = user.following.all()
+        if user.is_staff:
+            queryset = Follow.objects.all()
         return queryset
 
     def perform_create(self, serializer):
