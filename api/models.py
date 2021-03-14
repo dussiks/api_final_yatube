@@ -13,7 +13,7 @@ class Group(models.Model):
 
 class PostQuerySet(models.QuerySet):
     def optimized(self):
-        return self.select_related('group', 'author').all()
+        return self.select_related('group', 'author')
 
 
 class Post(models.Model):

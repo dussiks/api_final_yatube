@@ -53,10 +53,9 @@ class FollowViewSet(CreateListViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        queryset = user.following.all()
         if user.is_staff:
-            queryset = Follow.objects.all()
-        return queryset
+            return Follow.objects.all()
+        return user.following.all()
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
